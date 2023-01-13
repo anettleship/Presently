@@ -20,5 +20,7 @@
         <attr name="highlightColor" format="color" />
         <attr name="fabColor" format="color" />
         <attr name="fabTextColor" format="color" />
+
+        <attr name="settingsBackgroundColor" format="color" />
     </declare-styleable>
 </resources>

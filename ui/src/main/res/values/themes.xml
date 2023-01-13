@@ -723,6 +723,7 @@
         <item name="entryBodyColor">@color/emiliaEntryBodyColor</item>
         <item name="entryHintColor">@color/emiliaEntryHintColor</item>
 
+        <item name="settingsBackgroundColor">@color/emiliaSettingsBackgroundColor</item>
         <item name="highlightColor">@color/emiliaAndroidWidgetColor</item>
     </style>
 
