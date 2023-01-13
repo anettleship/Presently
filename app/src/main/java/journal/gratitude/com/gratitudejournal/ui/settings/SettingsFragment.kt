@@ -449,7 +449,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
      * */
     private fun importFromCsv() {
         val alertDialog: AlertDialog? = activity?.let {
-            val builder = AlertDialog.Builder(it)
+            val builder = AlertDialog.Builder(it, R.style.AppTheme)
             builder.apply {
                 setTitle(R.string.import_data_dialog)
                 setMessage(R.string.import_data_dialog_message)
