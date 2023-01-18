@@ -10,12 +10,16 @@ import android.os.Bundle
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.util.TypedValue
 import android.view.View
+import android.widget.AbsListView
+import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.get
 import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
@@ -461,9 +465,72 @@ class SettingsFragment : PreferenceFragmentCompat(),
             // Create the AlertDialog
             builder.create()
         }
+
+        val content = alertDialog?.findViewById<View>(android.R.id.content)
+        val listView = alertDialog?.listView
+
+        val theme = context?.theme
+        val attrs = IntArray(3)
+        attrs[0] = R.attr.timelineBackgroundColor
+        attrs[1] = R.attr.timelineBodyColor
+        val typedArray = theme?.obtainStyledAttributes(attrs)
+
+        val backgroundColor  = typedArray?.getColor(0, Color.WHITE)
+        backgroundColor?.let { content?.setBackgroundColor(it) }
+        val textColor = typedArray?.getColor(1, Color.WHITE)
+
+        if(textColor != null) {
+            /**
+             * Must make sure the alertDialog is created before we can access views
+             */
+            alertDialog?.setOnShowListener {
+                setDialogTitleColor(textColor)
+                if (listView != null) {
+                    setColorListItemColor(listView, textColor)
+                }
+
+                /*
+                   When items are scrolled in ListView, items are created and removed,
+                   so we need to recolor some items
+                 */
+                listView?.setOnScrollListener(object : AbsListView.OnScrollListener {
+                    override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {}
+
+                    /*
+                       Use this method instead of other to avoid having wait the end of scroll event
+                     */
+                    override fun onScroll(
+                        view: AbsListView?, firstVisibleItem: Int,
+                        visibleItemCount: Int, totalItemCount: Int
+                    ) {
+                        setColorListItemColor(listView, textColor)
+                    }
+                })
+
+            }
+        }
+
         alertDialog?.show()
     }
 
+
+    private fun setColorListItemColor(listView: ListView, color: Int) {
+        for (i in 0 until listView.count) {
+            try {
+                listView[i].findViewById<TextView>(android.R.id.text1).setTextColor(color)
+            } catch (e: IndexOutOfBoundsException) {
+                // Exception is caused by accessing item not rendered in listview
+            }
+        }
+    }
+
+    private  fun setDialogTitleColor(color: Int) {
+        val titleId = resources.getIdentifier("alertTitle", "id", context?.packageName)
+        if (titleId > 0) {
+            val dialogTitle: TextView? = dialog?.findViewById(titleId)
+            dialogTitle?.setTextColor(color)
+        }
+    }
     /**
      * Result contract for activity result to read from the backup CSV file
      * */
